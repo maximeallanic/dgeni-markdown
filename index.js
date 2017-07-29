@@ -7,6 +7,8 @@ module.exports = new Package('dgeni-markdown', [
   require('dgeni-packages/ngdoc'),
   require('dgeni-packages/nunjucks')
 ])
+        .factory(require('./file-readers/css'))
+        .processor(require('./processors/extract-css-comment'))
 //
 .config(function(templateFinder, templateEngine, getInjectables) {
   templateFinder.templateFolders = [path.resolve(__dirname, 'templates')];
@@ -35,7 +37,7 @@ module.exports = new Package('dgeni-markdown', [
 // 
 .config(function(computeIdsProcessor, createDocMessage, getAliases) {
   computeIdsProcessor.idTemplates.push({
-    docTypes: ['controller', 'provider', 'service', 'directive', 'input', 'object', 'function', 'filter', 'type' ],
+    docTypes: ['controller', 'provider', 'service', 'directive', 'input', 'object', 'function', 'filter', 'type', 'view', 'css'],
     idTemplate: 'module:${module}.${docType}:${name}',
     getAliases: getAliases
   });
@@ -45,7 +47,7 @@ module.exports = new Package('dgeni-markdown', [
 .config(function(computePathsProcessor, createDocMessage) {
   computePathsProcessor.pathTemplates = [];
   computePathsProcessor.pathTemplates.push({
-    docTypes: ['controller', 'provider', 'service', 'directive', 'input', 'object', 'function', 'filter', 'type' ],
+    docTypes: ['controller', 'provider', 'service', 'directive', 'input', 'object', 'function', 'filter', 'type', 'view', 'css'],
     pathTemplate: '${area}/${module}/${docType}/${name}',
     outputPathTemplate: '${module}/${docType}/${name}.md'
   });
@@ -59,4 +61,7 @@ module.exports = new Package('dgeni-markdown', [
     pathTemplate: '${area}/${moduleName}/${groupType}',
     outputPathTemplate: '${moduleName}/${groupType}/index.md'
   });
-});
+})
+        .config(function (readFilesProcessor, cssFileReader) {
+            readFilesProcessor.fileReaders.push(cssFileReader);
+        });
